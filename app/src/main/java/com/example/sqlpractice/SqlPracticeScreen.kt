@@ -1,6 +1,12 @@
 package com.example.sqlpractice
 
+import android.content.ContentValues
+import android.content.Context
+import android.content.Intent
 import android.database.sqlite.SQLiteDatabase
+import android.net.Uri
+import android.os.Environment
+import android.provider.MediaStore
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -9,9 +15,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import java.io.File
-import java.io.FileWriter
-import java.io.FileOutputStream
+import kotlinx.coroutines.launch
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
 
 @Composable
@@ -23,94 +27,138 @@ fun SqlPracticeScreen(modifier: Modifier = Modifier) {
     var query by remember { mutableStateOf("") }
     var columns by remember { mutableStateOf<List<String>>(emptyList()) }
     var rows by remember { mutableStateOf<List<List<String>>>(emptyList()) }
-    var message by remember { mutableStateOf<String?>(null) }
+    var showExportDialog by remember { mutableStateOf(false) }
+    var exportedFileUri by remember { mutableStateOf<String?>(null) }
+    var exportedMime by remember { mutableStateOf<String?>(null) }
 
-    Column(modifier = modifier.padding(16.dp)) {
-        Text("SQL Practice", style = MaterialTheme.typography.headlineSmall)
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
 
-        OutlinedTextField(
-            value = query,
-            onValueChange = { query = it },
-            label = { Text("Escribe tu consulta SQL") },
-            modifier = Modifier.fillMaxWidth()
-        )
+    Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
+        modifier = modifier
+    ) { innerPadding ->
+        Column(modifier = Modifier.padding(innerPadding).padding(16.dp)) {
+            Text("SQL Practice", style = MaterialTheme.typography.headlineSmall)
 
-        Spacer(Modifier.height(8.dp))
+            OutlinedTextField(
+                value = query,
+                onValueChange = { query = it },
+                label = { Text("Escribe tu consulta SQL") },
+                modifier = Modifier.fillMaxWidth()
+            )
 
-        Row {
-            Button(onClick = {
-                if (query.isBlank()) {
-                    message = "Debes escribir una consulta"
-                } else {
-                    try {
-                        val cursor = db.rawQuery(query, null)
+            Spacer(Modifier.height(8.dp))
 
-                        val colNames = (0 until cursor.columnCount).map { cursor.getColumnName(it) }
-                        val rowData = mutableListOf<List<String>>()
+            Row {
+                Button(onClick = {
+                    if (query.isNotBlank()) {
+                        try {
+                            val cursor = db.rawQuery(query, null)
 
-                        while (cursor.moveToNext()) {
-                            val row = (0 until cursor.columnCount).map { cursor.getString(it) ?: "" }
-                            rowData.add(row)
+                            val colNames = (0 until cursor.columnCount).map { cursor.getColumnName(it) }
+                            val rowData = mutableListOf<List<String>>()
+
+                            while (cursor.moveToNext()) {
+                                val row = (0 until cursor.columnCount).map { cursor.getString(it) ?: "" }
+                                rowData.add(row)
+                            }
+                            cursor.close()
+
+                            columns = colNames
+                            rows = rowData
+                        } catch (e: Exception) {
+                            scope.launch {
+                                snackbarHostState.showSnackbar("Error en consulta: ${e.message}")
+                            }
+                            columns = emptyList()
+                            rows = emptyList()
                         }
-                        cursor.close()
-
-                        columns = colNames
-                        rows = rowData
-                        message = null
-                    } catch (e: Exception) {
-                        message = "Error en consulta: ${e.message}"
-                        columns = emptyList()
-                        rows = emptyList()
                     }
+                }) {
+                    Text("Ejecutar")
                 }
-            }) {
-                Text("Ejecutar")
-            }
 
-            Spacer(Modifier.width(8.dp))
+                Spacer(Modifier.width(8.dp))
 
-            OutlinedButton(onClick = {
-                query = ""
-                columns = emptyList()
-                rows = emptyList()
-                message = null
-            }) {
-                Text("Limpiar")
-            }
-
-            Spacer(Modifier.width(8.dp))
-
-            Button(onClick = {
-                if (columns.isNotEmpty() && rows.isNotEmpty()) {
-                    val file = exportToCsv(context, columns, rows)
-                    message = if (file != null) "CSV guardado en: ${file.absolutePath}" else "Error exportando CSV"
-                } else {
-                    message = "No hay datos para exportar"
+                OutlinedButton(onClick = {
+                    query = ""
+                    columns = emptyList()
+                    rows = emptyList()
+                }) {
+                    Text("Limpiar")
                 }
-            }) {
-                Text("Exportar CSV")
-            }
 
-            Spacer(Modifier.width(8.dp))
+                Spacer(Modifier.width(8.dp))
 
-            Button(onClick = {
-                if (columns.isNotEmpty() && rows.isNotEmpty()) {
-                    val file = exportToExcel(context, columns, rows)
-                    message = if (file != null) "Excel guardado en: ${file.absolutePath}" else "Error exportando Excel"
-                } else {
-                    message = "No hay datos para exportar"
+                Button(onClick = { showExportDialog = true }) {
+                    Text("Exportar")
                 }
-            }) {
-                Text("Exportar Excel")
             }
-        }
 
-        Spacer(Modifier.height(16.dp))
+            // Export dialog
+            if (showExportDialog) {
+                AlertDialog(
+                    onDismissRequest = { showExportDialog = false },
+                    title = { Text("Exportar resultados") },
+                    text = { Text("Elige el formato de exportación:") },
+                    confirmButton = {
+                        Column {
+                            Button(onClick = {
+                                val uri = exportToCsv(context, columns, rows)
+                                if (uri != null) {
+                                    exportedFileUri = uri.toString()
+                                    exportedMime = "text/csv"
+                                    scope.launch {
+                                        snackbarHostState.showSnackbar(
+                                            message = "CSV exportado a Descargas",
+                                            actionLabel = "Abrir"
+                                        ).let { result ->
+                                            if (result == SnackbarResult.ActionPerformed) {
+                                                openFile(context, uri, exportedMime!!)
+                                            }
+                                        }
+                                    }
+                                }
+                                showExportDialog = false
+                            }, modifier = Modifier.fillMaxWidth().padding(bottom = 4.dp)) {
+                                Text("Exportar a CSV")
+                            }
+                            Button(onClick = {
+                                val uri = exportToExcel(context, columns, rows)
+                                if (uri != null) {
+                                    exportedFileUri = uri.toString()
+                                    exportedMime = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                                    scope.launch {
+                                        snackbarHostState.showSnackbar(
+                                            message = "Excel exportado a Descargas",
+                                            actionLabel = "Abrir"
+                                        ).let { result ->
+                                            if (result == SnackbarResult.ActionPerformed) {
+                                                openFile(context, uri, exportedMime!!)
+                                            }
+                                        }
+                                    }
+                                }
+                                showExportDialog = false
+                            }, modifier = Modifier.fillMaxWidth()) {
+                                Text("Exportar a Excel (.xlsx)")
+                            }
+                        }
+                    },
+                    dismissButton = {
+                        TextButton(onClick = { showExportDialog = false }) {
+                            Text("Cancelar")
+                        }
+                    }
+                )
+            }
 
-        when {
-            message != null -> Text(message!!, color = MaterialTheme.colorScheme.primary)
-            rows.isNotEmpty() -> QueryResultTable(columns, rows)
-            else -> Text("Aún no ejecutas ninguna consulta.")
+            Spacer(Modifier.height(8.dp))
+
+            if (rows.isNotEmpty()) {
+                QueryResultTable(columns, rows)
+            }
         }
     }
 }
@@ -118,7 +166,6 @@ fun SqlPracticeScreen(modifier: Modifier = Modifier) {
 @Composable
 fun QueryResultTable(columns: List<String>, rows: List<List<String>>) {
     Column(Modifier.fillMaxWidth().padding(4.dp)) {
-        // Cabecera
         Row(Modifier.fillMaxWidth()) {
             columns.forEach { col ->
                 Text(
@@ -131,8 +178,6 @@ fun QueryResultTable(columns: List<String>, rows: List<List<String>>) {
             }
         }
         Divider()
-
-        // Filas
         LazyColumn {
             items(rows) { row ->
                 Row(Modifier.fillMaxWidth()) {
@@ -152,53 +197,70 @@ fun QueryResultTable(columns: List<String>, rows: List<List<String>>) {
     }
 }
 
-/**
- * Exporta resultados a CSV
- */
-fun exportToCsv(context: android.content.Context, columns: List<String>, rows: List<List<String>>): File? {
+/** Exportar CSV con MediaStore */
+fun exportToCsv(context: Context, columns: List<String>, rows: List<List<String>>): Uri? {
     return try {
-        val file = File(context.getExternalFilesDir(null), "resultado.csv")
-        FileWriter(file).use { writer ->
-            writer.append(columns.joinToString(",")).append("\n")
-            for (row in rows) {
-                writer.append(row.joinToString(",")).append("\n")
+        val resolver = context.contentResolver
+        val contentValues = ContentValues().apply {
+            put(MediaStore.Downloads.DISPLAY_NAME, "resultado.csv")
+            put(MediaStore.Downloads.MIME_TYPE, "text/csv")
+            put(MediaStore.Downloads.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS)
+        }
+        val uri = resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, contentValues)
+        uri?.let {
+            resolver.openOutputStream(it)?.use { outputStream ->
+                outputStream.write((columns.joinToString(",") + "\n").toByteArray())
+                for (row in rows) {
+                    outputStream.write((row.joinToString(",") + "\n").toByteArray())
+                }
             }
         }
-        file
+        uri
     } catch (e: Exception) {
         e.printStackTrace()
         null
     }
 }
 
-/**
- * Exporta resultados a Excel (.xlsx)
- */
-fun exportToExcel(context: android.content.Context, columns: List<String>, rows: List<List<String>>): File? {
+/** Exportar Excel con MediaStore */
+fun exportToExcel(context: Context, columns: List<String>, rows: List<List<String>>): Uri? {
     return try {
-        val workbook = XSSFWorkbook()
-        val sheet = workbook.createSheet("Resultados")
-
-        // Cabecera
-        val headerRow = sheet.createRow(0)
-        columns.forEachIndexed { i, col ->
-            headerRow.createCell(i).setCellValue(col)
+        val resolver = context.contentResolver
+        val contentValues = ContentValues().apply {
+            put(MediaStore.Downloads.DISPLAY_NAME, "resultado.xlsx")
+            put(MediaStore.Downloads.MIME_TYPE, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+            put(MediaStore.Downloads.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS)
         }
+        val uri = resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, contentValues)
+        uri?.let {
+            resolver.openOutputStream(it)?.use { outputStream ->
+                val workbook = XSSFWorkbook()
+                val sheet = workbook.createSheet("Resultados")
 
-        // Filas
-        rows.forEachIndexed { rowIndex, row ->
-            val excelRow = sheet.createRow(rowIndex + 1)
-            row.forEachIndexed { i, value ->
-                excelRow.createCell(i).setCellValue(value)
+                val headerRow = sheet.createRow(0)
+                columns.forEachIndexed { i, col -> headerRow.createCell(i).setCellValue(col) }
+
+                rows.forEachIndexed { rowIndex, row ->
+                    val excelRow = sheet.createRow(rowIndex + 1)
+                    row.forEachIndexed { i, value -> excelRow.createCell(i).setCellValue(value) }
+                }
+
+                workbook.write(outputStream)
+                workbook.close()
             }
         }
-
-        val file = File(context.getExternalFilesDir(null), "resultado.xlsx")
-        FileOutputStream(file).use { out -> workbook.write(out) }
-        workbook.close()
-        file
+        uri
     } catch (e: Exception) {
         e.printStackTrace()
         null
     }
+}
+
+/** Abrir archivo con Intent */
+fun openFile(context: Context, uri: Uri, mimeType: String) {
+    val intent = Intent(Intent.ACTION_VIEW).apply {
+        setDataAndType(uri, mimeType)
+        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+    }
+    context.startActivity(Intent.createChooser(intent, "Abrir con"))
 }
