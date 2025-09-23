@@ -17,7 +17,13 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             SQLPracticeTheme {
-                MainScreen()
+                var isLoggedIn by remember { mutableStateOf(false) }
+
+                if (isLoggedIn) {
+                    MainScreen()
+                } else {
+                    LoginScreen(onLogin = { isLoggedIn = true })
+                }
             }
         }
     }
