@@ -51,5 +51,8 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     implementation("androidx.compose.foundation:foundation")
 
+    implementation("org.apache.poi:poi:5.2.5")
+    implementation("org.apache.poi:poi-ooxml:5.2.5")
+
 }
 
