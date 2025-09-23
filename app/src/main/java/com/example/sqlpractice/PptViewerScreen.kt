@@ -29,7 +29,12 @@ import androidx.compose.foundation.layout.padding
 import java.io.File
 import java.io.FileOutputStream
 
-
+fun formatPdfName(fileName: String): String {
+    return fileName
+        .removeSuffix(".pdf")
+        .replace("_", " ")
+        .trim()
+}
 
 @Composable
 fun PptViewerScreen(modifier: Modifier = Modifier) {
@@ -70,7 +75,7 @@ fun PdfListScreen(onPdfSelected: (String) -> Unit, modifier: Modifier = Modifier
                 elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
             ) {
                 Text(
-                    text = fileName,
+                    text = formatPdfName(fileName), //  aquí formateamos
                     modifier = Modifier.padding(16.dp),
                     style = MaterialTheme.typography.bodyLarge
                 )

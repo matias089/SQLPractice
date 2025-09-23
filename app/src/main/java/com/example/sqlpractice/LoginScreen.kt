@@ -1,10 +1,12 @@
 package com.example.sqlpractice
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 
@@ -20,6 +22,16 @@ fun LoginScreen(onLogin: () -> Unit) {
         contentAlignment = Alignment.Center
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
+
+            // 👇 Logo arriba
+            Image(
+                painter = painterResource(id = R.drawable.logo), // Asegúrate que tu logo esté en drawable/logo.png
+                contentDescription = "App Logo",
+                modifier = Modifier
+                    .size(120.dp)
+                    .padding(bottom = 24.dp)
+            )
+
             Text("Iniciar Sesión", style = MaterialTheme.typography.headlineSmall)
 
             Spacer(Modifier.height(16.dp))
