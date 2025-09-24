@@ -21,8 +21,21 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook
 @Composable
 fun SqlPracticeScreen(modifier: Modifier = Modifier) {
     val context = LocalContext.current
-    val dbHelper = remember { DBHelper(context) }
-    val db: SQLiteDatabase = remember { dbHelper.readableDatabase }
+
+    // Definir las bases disponibles
+    val databases = listOf(
+        "ipfuturo" to "ipfuturo.sql",
+        "truck_rental" to "truck_rental.sql",
+        "rent_a_house" to "rent_a_house.sql"
+    )
+
+    var expanded by remember { mutableStateOf(false) }
+    var selectedDb by remember { mutableStateOf(databases[0]) }
+
+    // Inicializar la DB seleccionada
+    LaunchedEffect(selectedDb) {
+        DatabaseHelper.initializeDatabase(context, selectedDb.first, selectedDb.second)
+    }
 
     var query by remember { mutableStateOf("") }
     var columns by remember { mutableStateOf<List<String>>(emptyList()) }
@@ -41,6 +54,29 @@ fun SqlPracticeScreen(modifier: Modifier = Modifier) {
         Column(modifier = Modifier.padding(innerPadding).padding(16.dp)) {
             Text("SQL Practice", style = MaterialTheme.typography.headlineSmall)
 
+            Spacer(Modifier.height(8.dp))
+
+            // Selector de base de datos
+            Box {
+                OutlinedButton(onClick = { expanded = true }) {
+                    Text("Base: ${selectedDb.first}")
+                }
+                DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+                    databases.forEach { db ->
+                        DropdownMenuItem(
+                            text = { Text(db.first) },
+                            onClick = {
+                                selectedDb = db
+                                expanded = false
+                                DatabaseHelper.initializeDatabase(context, db.first, db.second)
+                            }
+                        )
+                    }
+                }
+            }
+
+            Spacer(Modifier.height(8.dp))
+
             OutlinedTextField(
                 value = query,
                 onValueChange = { query = it },
@@ -53,26 +89,21 @@ fun SqlPracticeScreen(modifier: Modifier = Modifier) {
             Row {
                 Button(onClick = {
                     if (query.isNotBlank()) {
-                        try {
-                            val cursor = db.rawQuery(query, null)
-
-                            val colNames = (0 until cursor.columnCount).map { cursor.getColumnName(it) }
-                            val rowData = mutableListOf<List<String>>()
-
-                            while (cursor.moveToNext()) {
-                                val row = (0 until cursor.columnCount).map { cursor.getString(it) ?: "" }
-                                rowData.add(row)
-                            }
-                            cursor.close()
-
-                            columns = colNames
-                            rows = rowData
-                        } catch (e: Exception) {
+                        val result = DatabaseHelper.executeQuery(context, selectedDb.first, query)
+                        if (result.startsWith("Error")) {
                             scope.launch {
-                                snackbarHostState.showSnackbar("Error en consulta: ${e.message}")
+                                snackbarHostState.showSnackbar(result)
                             }
                             columns = emptyList()
                             rows = emptyList()
+                        } else {
+                            val lines = result.lines().filter { it.isNotBlank() }
+                            if (lines.isNotEmpty()) {
+                                columns = lines.first().split("|").map { it.trim() }.filter { it.isNotEmpty() }
+                                rows = lines.drop(1).map { row ->
+                                    row.split("|").map { it.trim() }.filter { it.isNotEmpty() }
+                                }
+                            }
                         }
                     }
                 }) {
