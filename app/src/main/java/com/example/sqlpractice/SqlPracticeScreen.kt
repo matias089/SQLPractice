@@ -18,6 +18,8 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
 
+import com.example.sqlpractice.QueryResultTable
+
 @Composable
 fun SqlPracticeScreen(modifier: Modifier = Modifier) {
     val context = LocalContext.current
@@ -189,40 +191,6 @@ fun SqlPracticeScreen(modifier: Modifier = Modifier) {
 
             if (rows.isNotEmpty()) {
                 QueryResultTable(columns, rows)
-            }
-        }
-    }
-}
-
-@Composable
-fun QueryResultTable(columns: List<String>, rows: List<List<String>>) {
-    Column(Modifier.fillMaxWidth().padding(4.dp)) {
-        Row(Modifier.fillMaxWidth()) {
-            columns.forEach { col ->
-                Text(
-                    text = col,
-                    style = MaterialTheme.typography.bodyMedium,
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(4.dp)
-                )
-            }
-        }
-        Divider()
-        LazyColumn {
-            items(rows) { row ->
-                Row(Modifier.fillMaxWidth()) {
-                    row.forEach { value ->
-                        Text(
-                            text = value,
-                            style = MaterialTheme.typography.bodySmall,
-                            modifier = Modifier
-                                .weight(1f)
-                                .padding(4.dp)
-                        )
-                    }
-                }
-                Divider()
             }
         }
     }
