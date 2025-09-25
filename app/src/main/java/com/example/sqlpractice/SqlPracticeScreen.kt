@@ -61,7 +61,7 @@ fun SqlPracticeScreen(modifier: Modifier = Modifier) {
             // Selector de base de datos
             Box {
                 OutlinedButton(onClick = { expanded = true }) {
-                    Text("Base: ${selectedDb.first}")
+                    Text("Base de datos seleccionada: ${selectedDb.first}")
                 }
                 DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
                     databases.forEach { db ->
