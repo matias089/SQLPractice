@@ -44,7 +44,10 @@ fun MainScreen(
             )
         },
         bottomBar = {
-            NavigationBar(containerColor = Color.White) {
+            NavigationBar(
+                containerColor = MaterialTheme.colorScheme.surface, // dinámico según el tema
+                contentColor = MaterialTheme.colorScheme.onSurface  // íconos y texto
+            ) {
                 NavigationBarItem(
                     selected = currentScreen == Screen.PPT,
                     onClick = { currentScreen = Screen.PPT },
@@ -66,27 +69,26 @@ fun MainScreen(
             }
         }
     ) { innerPadding ->
-        Box(modifier = Modifier.padding(innerPadding)) {
-            when (currentScreen) {
-                Screen.PPT -> PptViewerScreen(modifier = Modifier.padding(innerPadding))
-                Screen.SQL -> SqlPracticeScreen(modifier = Modifier.padding(innerPadding))
-                Screen.EXERCISES -> {
-                    var selectedExercise by remember { mutableStateOf<SqlExercise?>(null) }
-                    if (selectedExercise == null) {
-                        SqlExerciseListScreen(
-                            onExerciseSelected = { selectedExercise = it },
-                            modifier = Modifier.padding(innerPadding)
-                        )
-                    } else {
-                        Column(modifier = Modifier.padding(innerPadding)) {
-                            Button(onClick = { selectedExercise = null }) {
-                                Text("Volver a la lista")
-                            }
-                            SqlExerciseScreen(exercise = selectedExercise!!)
+    Box(modifier = Modifier.padding(innerPadding)) {
+        when (currentScreen) {
+            Screen.PPT -> PptViewerScreen()
+            Screen.SQL -> SqlPracticeScreen()
+            Screen.EXERCISES -> {
+                var selectedExercise by remember { mutableStateOf<SqlExercise?>(null) }
+                if (selectedExercise == null) {
+                    SqlExerciseListScreen(
+                        onExerciseSelected = { selectedExercise = it }
+                    )
+                } else {
+                    Column {
+                        Button(onClick = { selectedExercise = null }) {
+                            Text("Volver a la lista")
                         }
+                        SqlExerciseScreen(exercise = selectedExercise!!)
                     }
                 }
             }
         }
     }
+}
 }
