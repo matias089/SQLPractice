@@ -11,6 +11,7 @@ import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.LightMode
+import androidx.compose.material.icons.filled.HelpOutline
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -19,6 +20,7 @@ fun MainScreen(
     onToggleTheme: () -> Unit
 ) {
     var currentScreen by remember { mutableStateOf<Screen>(Screen.PPT) }
+    var showHelp by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
@@ -33,10 +35,20 @@ fun MainScreen(
                     containerColor = Color(0xFFFFC107) // Amarillo tipo logo
                 ),
                 actions = {
+                    // Botón claro/oscuro
                     IconButton(onClick = { onToggleTheme() }) {
                         Icon(
                             imageVector = if (isDarkTheme) Icons.Filled.DarkMode else Icons.Filled.LightMode,
                             contentDescription = "Cambiar tema",
+                            tint = Color.Black
+                        )
+                    }
+
+                    // Botón ayuda
+                    IconButton(onClick = { showHelp = true }) {
+                        Icon(
+                            imageVector = Icons.Filled.HelpOutline,
+                            contentDescription = "Ayuda",
                             tint = Color.Black
                         )
                     }
@@ -45,8 +57,8 @@ fun MainScreen(
         },
         bottomBar = {
             NavigationBar(
-                containerColor = MaterialTheme.colorScheme.surface, // dinámico según el tema
-                contentColor = MaterialTheme.colorScheme.onSurface  // íconos y texto
+                containerColor = MaterialTheme.colorScheme.surface,
+                contentColor = MaterialTheme.colorScheme.onSurface
             ) {
                 NavigationBarItem(
                     selected = currentScreen == Screen.PPT,
@@ -69,26 +81,31 @@ fun MainScreen(
             }
         }
     ) { innerPadding ->
-    Box(modifier = Modifier.padding(innerPadding)) {
-        when (currentScreen) {
-            Screen.PPT -> PptViewerScreen()
-            Screen.SQL -> SqlPracticeScreen()
-            Screen.EXERCISES -> {
-                var selectedExercise by remember { mutableStateOf<SqlExercise?>(null) }
-                if (selectedExercise == null) {
-                    SqlExerciseListScreen(
-                        onExerciseSelected = { selectedExercise = it }
-                    )
-                } else {
-                    Column {
-                        Button(onClick = { selectedExercise = null }) {
-                            Text("Volver a la lista")
+        Box(modifier = Modifier.padding(innerPadding)) {
+            when (currentScreen) {
+                Screen.PPT -> PptViewerScreen()
+                Screen.SQL -> SqlPracticeScreen()
+                Screen.EXERCISES -> {
+                    var selectedExercise by remember { mutableStateOf<SqlExercise?>(null) }
+                    if (selectedExercise == null) {
+                        SqlExerciseListScreen(
+                            onExerciseSelected = { selectedExercise = it }
+                        )
+                    } else {
+                        Column {
+                            Button(onClick = { selectedExercise = null }) {
+                                Text("Volver a la lista")
+                            }
+                            SqlExerciseScreen(exercise = selectedExercise!!)
                         }
-                        SqlExerciseScreen(exercise = selectedExercise!!)
                     }
                 }
             }
         }
+
+        // Mostrar ayuda contextual
+        if (showHelp) {
+            HelpScreen(screen = currentScreen, onDismiss = { showHelp = false })
+        }
     }
-}
 }
