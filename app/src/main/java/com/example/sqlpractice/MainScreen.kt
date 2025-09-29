@@ -12,10 +12,12 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material.icons.filled.HelpOutline
+import androidx.navigation.NavController
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(
+    navController: NavController,
     isDarkTheme: Boolean,
     onToggleTheme: () -> Unit
 ) {
@@ -35,16 +37,13 @@ fun MainScreen(
                     containerColor = Color(0xFFFFC107) // Amarillo tipo logo
                 ),
                 actions = {
-                    // Botón claro/oscuro
-                    IconButton(onClick = { onToggleTheme() }) {
+                    IconButton(onClick = onToggleTheme) {
                         Icon(
                             imageVector = if (isDarkTheme) Icons.Filled.DarkMode else Icons.Filled.LightMode,
                             contentDescription = "Cambiar tema",
                             tint = Color.Black
                         )
                     }
-
-                    // Botón ayuda
                     IconButton(onClick = { showHelp = true }) {
                         Icon(
                             imageVector = Icons.Filled.HelpOutline,
@@ -86,24 +85,12 @@ fun MainScreen(
                 Screen.PPT -> PptViewerScreen()
                 Screen.SQL -> SqlPracticeScreen()
                 Screen.EXERCISES -> {
-                    var selectedExercise by remember { mutableStateOf<SqlExercise?>(null) }
-                    if (selectedExercise == null) {
-                        SqlExerciseListScreen(
-                            onExerciseSelected = { selectedExercise = it }
-                        )
-                    } else {
-                        Column {
-                            Button(onClick = { selectedExercise = null }) {
-                                Text("Volver a la lista")
-                            }
-                            SqlExerciseScreen(exercise = selectedExercise!!)
-                        }
-                    }
+                    // 👇 nombre correcto del composable de la lista
+                    ExerciseListScreen(navController = navController)
                 }
             }
         }
 
-        // Mostrar ayuda contextual
         if (showHelp) {
             HelpScreen(screen = currentScreen, onDismiss = { showHelp = false })
         }
