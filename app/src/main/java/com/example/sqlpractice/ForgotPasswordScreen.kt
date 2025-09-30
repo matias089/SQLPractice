@@ -1,5 +1,6 @@
 package com.example.sqlpractice
 
+import android.util.Patterns
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -10,23 +11,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
-import com.example.sqlpractice.AuthRepository
 
 @Composable
-fun LoginScreen(
-    onLoginSuccess: () -> Unit,
-    onNavigateToRegister: () -> Unit,
-    onNavigateToForgot: () -> Unit
+fun ForgotPasswordScreen(
+    onBackToLogin: () -> Unit
 ) {
     var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf<String?>(null) }
+    var infoMessage by remember { mutableStateOf<String?>(null) }
     var isLoading by remember { mutableStateOf(false) }
 
     Box(modifier = Modifier.fillMaxSize()) {
-
         // Fondo con logo desenfocado
         Image(
             painter = painterResource(id = R.drawable.logo),
@@ -58,7 +54,6 @@ fun LoginScreen(
                         .padding(24.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    // Logo pequeño
                     Image(
                         painter = painterResource(id = R.drawable.logo),
                         contentDescription = "App Logo",
@@ -67,40 +62,40 @@ fun LoginScreen(
                             .padding(bottom = 16.dp)
                     )
 
-                    Text("Bienvenido", style = MaterialTheme.typography.headlineSmall)
-
+                    Text("Recuperar contraseña", style = MaterialTheme.typography.headlineSmall)
                     Spacer(Modifier.height(16.dp))
 
                     OutlinedTextField(
                         value = email,
-                        onValueChange = { email = it },
+                        onValueChange = {
+                            email = it
+                            errorMessage = null
+                            infoMessage = null
+                        },
                         label = { Text("Correo") },
                         singleLine = true,
                         modifier = Modifier.fillMaxWidth()
                     )
 
-                    Spacer(Modifier.height(8.dp))
-
-                    OutlinedTextField(
-                        value = password,
-                        onValueChange = { password = it },
-                        label = { Text("Contraseña") },
-                        visualTransformation = PasswordVisualTransformation(),
-                        singleLine = true,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-
-                    Spacer(Modifier.height(24.dp))
+                    Spacer(Modifier.height(16.dp))
 
                     Button(
                         onClick = {
+                            errorMessage = null
+                            infoMessage = null
+
+                            if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+                                errorMessage = "Ingresa un correo válido."
+                                return@Button
+                            }
+
                             isLoading = true
-                            AuthRepository.loginUser(email, password) { success, error ->
+                            AuthRepository.sendPasswordReset(email) { ok, msg ->
                                 isLoading = false
-                                if (success) {
-                                    onLoginSuccess()
+                                if (ok) {
+                                    infoMessage = msg ?: "Te enviamos un correo para restablecer tu contraseña. Revisa bandeja de entrada y spam."
                                 } else {
-                                    errorMessage = error
+                                    errorMessage = msg ?: "No pudimos enviar el correo."
                                 }
                             }
                         },
@@ -115,27 +110,24 @@ fun LoginScreen(
                                 strokeWidth = 2.dp
                             )
                         } else {
-                            Text("Ingresar")
+                            Text("Enviar enlace")
                         }
-                    }
-                    Spacer(Modifier.height(4.dp))
-
-                    // 👉 Nuevo: ir a recuperar contraseña
-                    TextButton(onClick = onNavigateToForgot) {
-                        Text("¿Olvidaste tu contraseña?")
                     }
 
                     Spacer(Modifier.height(8.dp))
 
-                    // Botón para ir al registro
-                    TextButton(onClick = onNavigateToRegister) {
-                        Text("¿No tienes cuenta? Regístrate")
+                    TextButton(onClick = onBackToLogin) {
+                        Text("Volver al inicio de sesión")
                     }
 
-                    // Mostrar error si ocurre
+                    // Mensajes
                     errorMessage?.let {
                         Spacer(Modifier.height(12.dp))
                         Text("❌ $it", color = MaterialTheme.colorScheme.error)
+                    }
+                    infoMessage?.let {
+                        Spacer(Modifier.height(12.dp))
+                        Text("✅ $it", color = MaterialTheme.colorScheme.primary)
                     }
                 }
             }

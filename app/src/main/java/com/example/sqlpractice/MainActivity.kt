@@ -19,7 +19,9 @@ import androidx.navigation.compose.rememberNavController
 import com.example.sqlpractice.ui.theme.BlueLogo
 import com.example.sqlpractice.ui.theme.SQLPracticeTheme
 import com.google.firebase.FirebaseApp
+import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.tasks.await
 
 class MainActivity : ComponentActivity() {
@@ -28,6 +30,11 @@ class MainActivity : ComponentActivity() {
 
         // Inicializar Firebase
         FirebaseApp.initializeApp(this)
+
+        // Correos del sistema (Auth) en español
+        Firebase.auth.setLanguageCode("es")
+        // Alternativa automática según idioma del dispositivo:
+        // Firebase.auth.useAppLanguage()
 
         // Color de la barra de navegación
         window.navigationBarColor = BlueLogo.toArgb()
@@ -50,9 +57,8 @@ class MainActivity : ComponentActivity() {
                                     popUpTo("login") { inclusive = true }
                                 }
                             },
-                            onNavigateToRegister = {
-                                navController.navigate("register")
-                            }
+                            onNavigateToRegister = { navController.navigate("register") },
+                            onNavigateToForgot = { navController.navigate("forgot") }
                         )
                     }
 
@@ -81,6 +87,13 @@ class MainActivity : ComponentActivity() {
                                     popUpTo("register") { inclusive = true }
                                 }
                             },
+                            onBackToLogin = { navController.popBackStack() }
+                        )
+                    }
+
+                    // Recuperación de contraseña
+                    composable("forgot") {
+                        ForgotPasswordScreen(
                             onBackToLogin = { navController.popBackStack() }
                         )
                     }
