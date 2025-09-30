@@ -15,17 +15,17 @@ import androidx.compose.ui.unit.dp
 import com.example.sqlpractice.AuthRepository
 
 @Composable
-fun LoginScreen(
-    onLoginSuccess: () -> Unit,
-    onNavigateToRegister: () -> Unit
+fun RegisterScreen(
+    onRegisterSuccess: () -> Unit,
+    onBackToLogin: () -> Unit
 ) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    var confirmPassword by remember { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf<String?>(null) }
     var isLoading by remember { mutableStateOf(false) }
 
     Box(modifier = Modifier.fillMaxSize()) {
-
         // Fondo con logo desenfocado
         Image(
             painter = painterResource(id = R.drawable.logo),
@@ -57,7 +57,6 @@ fun LoginScreen(
                         .padding(24.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    // Logo pequeño
                     Image(
                         painter = painterResource(id = R.drawable.logo),
                         contentDescription = "App Logo",
@@ -66,7 +65,7 @@ fun LoginScreen(
                             .padding(bottom = 16.dp)
                     )
 
-                    Text("Bienvenido", style = MaterialTheme.typography.headlineSmall)
+                    Text("Crear cuenta", style = MaterialTheme.typography.headlineSmall)
 
                     Spacer(Modifier.height(16.dp))
 
@@ -89,15 +88,30 @@ fun LoginScreen(
                         modifier = Modifier.fillMaxWidth()
                     )
 
+                    Spacer(Modifier.height(8.dp))
+
+                    OutlinedTextField(
+                        value = confirmPassword,
+                        onValueChange = { confirmPassword = it },
+                        label = { Text("Confirmar contraseña") },
+                        visualTransformation = PasswordVisualTransformation(),
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
                     Spacer(Modifier.height(24.dp))
 
                     Button(
                         onClick = {
+                            if (password != confirmPassword) {
+                                errorMessage = "Las contraseñas no coinciden"
+                                return@Button
+                            }
                             isLoading = true
-                            AuthRepository.loginUser(email, password) { success, error ->
+                            AuthRepository.registerUser(email, password) { success, error ->
                                 isLoading = false
                                 if (success) {
-                                    onLoginSuccess()
+                                    onRegisterSuccess()
                                 } else {
                                     errorMessage = error
                                 }
@@ -114,18 +128,16 @@ fun LoginScreen(
                                 strokeWidth = 2.dp
                             )
                         } else {
-                            Text("Ingresar")
+                            Text("Registrar")
                         }
                     }
 
                     Spacer(Modifier.height(8.dp))
 
-                    // Botón para ir al registro
-                    TextButton(onClick = onNavigateToRegister) {
-                        Text("¿No tienes cuenta? Regístrate")
+                    TextButton(onClick = onBackToLogin) {
+                        Text("¿Ya tienes cuenta? Inicia sesión")
                     }
 
-                    // Mostrar error si ocurre
                     errorMessage?.let {
                         Spacer(Modifier.height(12.dp))
                         Text("❌ $it", color = MaterialTheme.colorScheme.error)

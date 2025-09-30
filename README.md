@@ -6,7 +6,7 @@ Aplicación Android en desarrollo orientada a la práctica de consultas SQL y ge
 
 ## 🚀 Estado del proyecto
 
-🔸 **Versión actual:** `v0.1-alpha`  
+🔸 **Versión actual:** `v0.2-alpha`  
 🔸 **Fase:** Desarrollo inicial / Validación funcional  
 🔸 **Última actualización:** 29 Septiembre 2025  
 
@@ -40,5 +40,5 @@ Facilitar el aprendizaje y la práctica de SQL mediante una app intuitiva, con e
 
 ---
 
-## 📁 Estructura del proyecto
-
+## 📁 Link de la última pre-release lanzada (V0.2): 
+https://github.com/matias089/SQLPractice/releases/tag/v0.1

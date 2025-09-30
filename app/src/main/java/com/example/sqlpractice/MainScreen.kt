@@ -12,6 +12,7 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material.icons.filled.HelpOutline
+import androidx.compose.material.icons.filled.Logout
 import androidx.navigation.NavController
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -48,6 +49,18 @@ fun MainScreen(
                         Icon(
                             imageVector = Icons.Filled.HelpOutline,
                             contentDescription = "Ayuda",
+                            tint = Color.Black
+                        )
+                    }
+                    IconButton(onClick = {
+                        AuthRepository.logout()
+                        navController.navigate("login") {
+                            popUpTo("main") { inclusive = true }
+                        }
+                    }) {
+                        Icon(
+                            imageVector = Icons.Filled.Logout,
+                            contentDescription = "Cerrar sesión",
                             tint = Color.Black
                         )
                     }

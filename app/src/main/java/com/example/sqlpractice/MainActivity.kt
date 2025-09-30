@@ -40,15 +40,20 @@ class MainActivity : ComponentActivity() {
 
                 NavHost(
                     navController = navController,
-                    startDestination = "login"
+                    startDestination = if (AuthRepository.getCurrentUser() != null) "main" else "login"
                 ) {
                     // Pantalla de Login
                     composable("login") {
-                        LoginScreen(onLogin = {
-                            navController.navigate("main") {
-                                popUpTo("login") { inclusive = true } // quita login del back stack
+                        LoginScreen(
+                            onLoginSuccess = {
+                                navController.navigate("main") {
+                                    popUpTo("login") { inclusive = true }
+                                }
+                            },
+                            onNavigateToRegister = {
+                                navController.navigate("register")
                             }
-                        })
+                        )
                     }
 
                     // Pantalla principal (con barra superior e inferior)
@@ -66,6 +71,18 @@ class MainActivity : ComponentActivity() {
                         exerciseId?.let { id ->
                             ExerciseDetailLoader(exerciseId = id.toInt())
                         }
+                    }
+
+                    // Registro de usuario
+                    composable("register") {
+                        RegisterScreen(
+                            onRegisterSuccess = {
+                                navController.navigate("main") {
+                                    popUpTo("register") { inclusive = true }
+                                }
+                            },
+                            onBackToLogin = { navController.popBackStack() }
+                        )
                     }
                 }
             }
