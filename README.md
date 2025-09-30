@@ -41,4 +41,4 @@ Facilitar el aprendizaje y la práctica de SQL mediante una app intuitiva, con e
 ---
 
 ## 📁 Link de la última pre-release lanzada (V0.2): 
-https://github.com/matias089/SQLPractice/releases/tag/v0.1
+https://github.com/matias089/SQLPractice/releases/tag/v0.2
