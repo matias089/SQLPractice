@@ -13,6 +13,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import com.example.sqlpractice.AuthRepository
+import com.example.sqlpractice.ui.components.AppFooter
 
 @Composable
 fun RegisterScreen(
@@ -145,5 +146,9 @@ fun RegisterScreen(
                 }
             }
         }
+        // Footer fijo abajo
+        AppFooter(
+            modifier = Modifier.align(Alignment.BottomCenter)
+        )
     }
 }

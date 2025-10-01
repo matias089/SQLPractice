@@ -14,7 +14,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.background
-
+import com.example.sqlpractice.ui.components.AppFooter
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -26,60 +26,68 @@ fun HelpScreen(
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
-        sheetState = sheetState,               // 👈 sin SheetDefaults
+        sheetState = sheetState,
         containerColor = MaterialTheme.colorScheme.surface,
         shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)
     ) {
+        // ⚡️ Usamos Column con SpaceBetween para empujar el footer abajo
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp)
-                .verticalScroll(rememberScrollState())
+                .verticalScroll(rememberScrollState()),
+            verticalArrangement = Arrangement.SpaceBetween
         ) {
-            // Tirador simple (compat)
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 8.dp, bottom = 12.dp),
-                contentAlignment = Alignment.Center
-            ) {
+            Column {
+                // Tirador simple (compat)
                 Box(
                     modifier = Modifier
-                        .width(36.dp)
-                        .height(4.dp)
-                        .then(Modifier)
-                        .background(
-                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f),
-                            shape = RoundedCornerShape(2.dp)
-                        )
+                        .fillMaxWidth()
+                        .padding(top = 8.dp, bottom = 12.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .width(36.dp)
+                            .height(4.dp)
+                            .background(
+                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f),
+                                shape = RoundedCornerShape(2.dp)
+                            )
+                    )
+                }
+
+                Text(
+                    text = "Ayuda — ${screen.title}",
+                    style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
+                    color = MaterialTheme.colorScheme.onSurface
                 )
+                Spacer(Modifier.height(12.dp))
+                Divider()
+                Spacer(Modifier.height(12.dp))
+
+                when (screen) {
+                    Screen.PPT -> HelpPresentaciones()
+                    Screen.SQL -> HelpSqlPractice()
+                    Screen.EXERCISES -> HelpEjercicios()
+                }
+
+                Spacer(Modifier.height(16.dp))
+                Divider()
+                Spacer(Modifier.height(8.dp))
+
+                Row(
+                    Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.End
+                ) {
+                    TextButton(onClick = onDismiss) { Text("Cerrar") }
+                }
+
+                Spacer(Modifier.height(8.dp))
             }
 
-            Text(
-                text = "Ayuda — ${screen.title}",
-                style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
-                color = MaterialTheme.colorScheme.onSurface
-            )
-            Spacer(Modifier.height(12.dp))
-            Divider()
-            Spacer(Modifier.height(12.dp))
-
-            when (screen) {
-                Screen.PPT -> HelpPresentaciones()
-                Screen.SQL -> HelpSqlPractice()
-                Screen.EXERCISES -> HelpEjercicios()
-            }
-
-            Spacer(Modifier.height(16.dp))
-            Divider()
-            Spacer(Modifier.height(8.dp))
-
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-                TextButton(onClick = onDismiss) { Text("Cerrar") }
-            }
-
-            // margen para no chocar con la nav bar
-            Spacer(Modifier.height(8.dp))
+            // Footer pegado al final del bottom sheet
+            AppFooter()
         }
     }
 }

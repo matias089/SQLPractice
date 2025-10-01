@@ -12,6 +12,7 @@ import androidx.compose.ui.draw.blur
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import com.example.sqlpractice.ui.components.AppFooter
 
 @Composable
 fun ForgotPasswordScreen(
@@ -132,5 +133,9 @@ fun ForgotPasswordScreen(
                 }
             }
         }
+        // Footer fijo abajo
+        AppFooter(
+            modifier = Modifier.align(Alignment.BottomCenter)
+        )
     }
 }
