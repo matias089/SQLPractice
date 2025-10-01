@@ -1,4 +1,4 @@
-package com.example.sqlpractice
+package com.acecorp.sqlpractice
 
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase

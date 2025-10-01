@@ -1,4 +1,4 @@
-package com.example.sqlpractice
+package com.acecorp.sqlpractice
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*

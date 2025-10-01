@@ -7,6 +7,25 @@
   "client": [
     {
       "client_info": {
+        "mobilesdk_app_id": "1:848624235925:android:5f0f739ea4f257d72f329c",
+        "android_client_info": {
+          "package_name": "com.acecorp.sqlpractice"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDb_fTsJCVipqztnNriWowIvs0ykwUyzE0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
         "mobilesdk_app_id": "1:848624235925:android:40e05279ba308aad2f329c",
         "android_client_info": {
           "package_name": "com.example.sqlpractice"

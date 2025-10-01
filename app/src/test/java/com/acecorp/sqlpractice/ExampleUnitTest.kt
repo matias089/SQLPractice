@@ -1,4 +1,4 @@
-package com.example.sqlpractice
+package com.acecorp.sqlpractice
 
 import org.junit.Test
 

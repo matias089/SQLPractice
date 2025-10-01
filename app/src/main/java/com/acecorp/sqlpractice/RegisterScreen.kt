@@ -1,4 +1,4 @@
-package com.example.sqlpractice
+package com.acecorp.sqlpractice
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
@@ -12,8 +12,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
-import com.example.sqlpractice.AuthRepository
-import com.example.sqlpractice.ui.components.AppFooter
+import com.acecorp.sqlpractice.ui.components.AppFooter
 
 @Composable
 fun RegisterScreen(

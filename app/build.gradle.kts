@@ -7,7 +7,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.sqlpractice"
+    namespace = "com.acecorp.sqlpractice"
     compileSdk = 36
 
     defaultConfig {

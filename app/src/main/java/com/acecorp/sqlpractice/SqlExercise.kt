@@ -1,4 +1,4 @@
-package com.example.sqlpractice
+package com.acecorp.sqlpractice
 
 // Modelo de un ejercicio SQL
 data class SqlExercise(

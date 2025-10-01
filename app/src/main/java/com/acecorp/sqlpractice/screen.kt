@@ -1,4 +1,4 @@
-package com.example.sqlpractice
+package com.acecorp.sqlpractice
 
 // Representa cada pantalla de la app
 sealed class Screen(val title: String) {

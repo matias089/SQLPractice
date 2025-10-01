@@ -1,4 +1,4 @@
-package com.example.sqlpractice.ui.theme
+package com.acecorp.sqlpractice.ui.theme
 
 import androidx.compose.ui.graphics.Color
 

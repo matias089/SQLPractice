@@ -1,4 +1,4 @@
-package com.example.sqlpractice
+package com.acecorp.sqlpractice
 
 import android.os.Bundle
 import android.util.Log
@@ -16,8 +16,8 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.sqlpractice.ui.theme.BlueLogo
-import com.example.sqlpractice.ui.theme.SQLPracticeTheme
+import com.acecorp.sqlpractice.ui.theme.BlueLogo
+import com.acecorp.sqlpractice.ui.theme.SQLPracticeTheme
 import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FirebaseFirestore

@@ -1,15 +1,12 @@
-package com.example.sqlpractice
+package com.acecorp.sqlpractice
 
 import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
-import android.database.sqlite.SQLiteDatabase
 import android.net.Uri
 import android.os.Environment
 import android.provider.MediaStore
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -17,8 +14,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
-
-import com.example.sqlpractice.QueryResultTable
 
 @Composable
 fun SqlPracticeScreen(modifier: Modifier = Modifier) {

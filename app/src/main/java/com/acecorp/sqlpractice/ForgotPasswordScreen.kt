@@ -1,4 +1,4 @@
-package com.example.sqlpractice
+package com.acecorp.sqlpractice
 
 import android.util.Patterns
 import androidx.compose.foundation.Image
@@ -12,7 +12,7 @@ import androidx.compose.ui.draw.blur
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import com.example.sqlpractice.ui.components.AppFooter
+import com.acecorp.sqlpractice.ui.components.AppFooter
 
 @Composable
 fun ForgotPasswordScreen(

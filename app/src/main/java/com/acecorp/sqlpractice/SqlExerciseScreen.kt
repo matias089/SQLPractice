@@ -1,4 +1,4 @@
-package com.example.sqlpractice
+package com.acecorp.sqlpractice
 
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
