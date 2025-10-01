@@ -4,14 +4,19 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDownward
+import androidx.compose.material.icons.filled.ArrowUpward
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.navigation.NavController
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
+
 
 // 🔹 Opciones de orden
 enum class SortOption(val label: String) {
@@ -29,6 +34,7 @@ fun ExerciseListScreen(navController: NavController) {
 
     var sortOption by remember { mutableStateOf(SortOption.CATEGORY) }
     var expanded by remember { mutableStateOf(false) }
+    var isAscending by remember { mutableStateOf(true) } // estado asc/desc
 
     // 🔹 Cargar ejercicios desde Firestore
     LaunchedEffect(Unit) {
@@ -48,7 +54,8 @@ fun ExerciseListScreen(navController: NavController) {
             TopAppBar(
                 title = { Text("Ejercicios SQL") },
                 actions = {
-                    Box {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        // 🔹 Botón de menú desplegable
                         TextButton(onClick = { expanded = true }) {
                             Text("Ordenar por: ${sortOption.label}")
                         }
@@ -66,26 +73,45 @@ fun ExerciseListScreen(navController: NavController) {
                                 )
                             }
                         }
+
+                        // 🔹 Botón asc/desc
+                        IconButton(onClick = { isAscending = !isAscending }) {
+                            if (isAscending) {
+                                Icon(Icons.Default.ArrowUpward, contentDescription = "Ascendente")
+                            } else {
+                                Icon(Icons.Default.ArrowDownward, contentDescription = "Descendente")
+                            }
+                        }
                     }
                 }
             )
         }
     ) { innerPadding ->
 
-        Box(
+    Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding),
+                .padding(
+                    start = innerPadding.calculateStartPadding(LayoutDirection.Ltr),
+                    end = innerPadding.calculateEndPadding(LayoutDirection.Ltr),
+                    top = innerPadding.calculateTopPadding(),
+                    bottom = 2.dp // margen inferior reducido
+                ),
             contentAlignment = Alignment.Center
         ) {
             when {
                 loading -> CircularProgressIndicator()
                 errorMessage != null -> Text(errorMessage ?: "Error desconocido")
                 else -> {
-                    val sortedExercises = when (sortOption) {
+                    // 🔹 Aplicar orden según la opción elegida
+                    var sortedExercises = when (sortOption) {
                         SortOption.CATEGORY -> exercises.sortedBy { it.category }
                         SortOption.TITLE -> exercises.sortedBy { it.title }
                         SortOption.ID -> exercises.sortedBy { it.id }
+                    }
+
+                    if (!isAscending) {
+                        sortedExercises = sortedExercises.reversed()
                     }
 
                     LazyColumn(
@@ -98,7 +124,6 @@ fun ExerciseListScreen(navController: NavController) {
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .clickable {
-                                        // 🔹 Podrías navegar al detalle
                                         // navController.navigate("exerciseDetail/${exercise.id}")
                                     },
                                 elevation = CardDefaults.cardElevation(4.dp)
