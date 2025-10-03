@@ -4,7 +4,7 @@
     "type": "APK",
     "kind": "Directory"
   },
-  "applicationId": "com.example.sqlpractice",
+  "applicationId": "com.acecorp.sqlpractice",
   "variantName": "release",
   "elements": [
     {
