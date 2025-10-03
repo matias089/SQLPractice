@@ -1,4 +1,4 @@
-# 📱 SQLPractice (Alpha v0.2.1)
+# 📱 SQLPractice (Alpha v0.3)
 
 Aplicación Android en desarrollo orientada a la práctica de consultas SQL y gestión de ejercicios educativos. Este proyecto combina Jetpack Compose, Firebase y buenas prácticas de arquitectura modular para ofrecer una experiencia clara, escalable y adaptable a distintos contextos de aprendizaje.
 
@@ -6,9 +6,9 @@ Aplicación Android en desarrollo orientada a la práctica de consultas SQL y ge
 
 ## 🚀 Estado del proyecto
 
-🔸 **Versión actual:** `v0.2-alpha`  
+🔸 **Versión actual:** `v0.3-alpha`  
 🔸 **Fase:** Desarrollo inicial / Validación funcional  
-🔸 **Última actualización:** 1 Octubre 2025  
+🔸 **Última actualización:** 3 Octubre 2025  
 
 ---
 
@@ -31,7 +31,7 @@ Facilitar el aprendizaje y la práctica de SQL mediante una app intuitiva, con e
 
 ## 📦 Funcionalidades actuales
 
-- 🔐 Pantalla de login (estructura base, autenticación básica con Firebase Auth)
+- 🔐 Pantalla de login (estructura base, autenticación personalizada Firebase Auth + Efectos)
 - 📚 Visualización de ejercicios SQL desde Firestore
 - ✍️ Edición y ejecución de consultas (modo local)
 - 📤 Exportación de resultados en formato CSV
@@ -40,5 +40,5 @@ Facilitar el aprendizaje y la práctica de SQL mediante una app intuitiva, con e
 
 ---
 
-## 📁 Link de la última pre-release lanzada (V0.2.1): 
-https://github.com/matias089/SQLPractice/releases/tag/v0.2.1
+## 📁 Link de la última pre-release lanzada (V0.3): 
+https://github.com/matias089/SQLPractice/releases/tag/v0.3
