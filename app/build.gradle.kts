@@ -11,7 +11,7 @@ android {
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.example.sqlpractice"
+        applicationId = "com.acecorp.sqlpractice"
         minSdk = 26
         targetSdk = 36
         versionCode = 1
@@ -60,7 +60,9 @@ dependencies {
     implementation("androidx.compose.material3:material3")
     implementation("androidx.compose.material:material-icons-extended")
     implementation("androidx.compose.ui:ui-tooling-preview")
+    implementation(libs.androidx.compose.foundation)
     debugImplementation("androidx.compose.ui:ui-tooling")
+
 
     // Navegación + Activity
     implementation("androidx.navigation:navigation-compose:2.8.2")

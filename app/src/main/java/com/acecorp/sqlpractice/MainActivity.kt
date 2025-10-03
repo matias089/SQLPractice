@@ -24,6 +24,14 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.tasks.await
 
+// ✅ Rutas centralizadas para evitar typos
+object Routes {
+    const val LOGIN = "login"
+    const val MAIN = "main"
+    const val FORGOT = "forgot"
+    const val EXERCISE_DETAIL = "exerciseDetail/{exerciseId}"
+}
+
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,8 +41,7 @@ class MainActivity : ComponentActivity() {
 
         // Correos del sistema (Auth) en español
         Firebase.auth.setLanguageCode("es")
-        // Alternativa automática según idioma del dispositivo:
-        // Firebase.auth.useAppLanguage()
+        // Firebase.auth.useAppLanguage() // alternativa automática
 
         // Color de la barra de navegación
         window.navigationBarColor = BlueLogo.toArgb()
@@ -47,23 +54,29 @@ class MainActivity : ComponentActivity() {
 
                 NavHost(
                     navController = navController,
-                    startDestination = if (AuthRepository.getCurrentUser() != null) "main" else "login"
+                    startDestination = if (AuthRepository.getCurrentUser() != null) Routes.MAIN else Routes.LOGIN
                 ) {
-                    // Pantalla de Login
-                    composable("login") {
-                        LoginScreen(
+                    // ✅ Pantalla de autenticación (AuthScreen único para login/registro)
+                    composable(Routes.LOGIN) {
+                        AuthScreen(
                             onLoginSuccess = {
-                                navController.navigate("main") {
-                                    popUpTo("login") { inclusive = true }
+                                navController.navigate(Routes.MAIN) {
+                                    popUpTo(Routes.LOGIN) { inclusive = true }
+                                    launchSingleTop = true
                                 }
                             },
-                            onNavigateToRegister = { navController.navigate("register") },
-                            onNavigateToForgot = { navController.navigate("forgot") }
+                            onRegisterSuccess = {
+                                navController.navigate(Routes.MAIN) {
+                                    popUpTo(Routes.LOGIN) { inclusive = true }
+                                    launchSingleTop = true
+                                }
+                            },
+                            onNavigateToForgot = { navController.navigate(Routes.FORGOT) }
                         )
                     }
 
                     // Pantalla principal (con barra superior e inferior)
-                    composable("main") {
+                    composable(Routes.MAIN) {
                         MainScreen(
                             navController = navController,
                             isDarkTheme = isDarkTheme,
@@ -72,27 +85,15 @@ class MainActivity : ComponentActivity() {
                     }
 
                     // Detalle de ejercicio
-                    composable("exerciseDetail/{exerciseId}") { backStackEntry ->
+                    composable(Routes.EXERCISE_DETAIL) { backStackEntry ->
                         val exerciseId = backStackEntry.arguments?.getString("exerciseId")
                         exerciseId?.let { id ->
                             ExerciseDetailLoader(exerciseId = id.toInt())
                         }
                     }
 
-                    // Registro de usuario
-                    composable("register") {
-                        RegisterScreen(
-                            onRegisterSuccess = {
-                                navController.navigate("main") {
-                                    popUpTo("register") { inclusive = true }
-                                }
-                            },
-                            onBackToLogin = { navController.popBackStack() }
-                        )
-                    }
-
                     // Recuperación de contraseña
-                    composable("forgot") {
+                    composable(Routes.FORGOT) {
                         ForgotPasswordScreen(
                             onBackToLogin = { navController.popBackStack() }
                         )
